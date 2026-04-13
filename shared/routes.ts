@@ -1,16 +1,34 @@
-
+﻿
 import { z } from 'zod';
-import { 
-  insertCashTransactionSchema, cashTransactions,
-  insertFlightBookingSchema, flightBookings,
-  insertVehicleSchema, vehicles,
-  insertCabBookingSchema, cabBookings,
-  insertCabRunSchema, cabRuns,
-  insertVisaApplicationSchema, visaApplications,
-  insertCreditCardSchema, creditCards,
-  insertVendorSchema, vendors,
-  insertVendorPaymentSchema, vendorPayments,
-  insertAttestationServiceSchema, attestationServices
+import {
+  insertCashTransactionSchema,
+  insertFlightBookingSchema,
+  insertVehicleSchema,
+  insertCabBookingSchema,
+  insertCabRunSchema,
+  insertVisaApplicationSchema,
+  insertCreditCardSchema,
+  insertVendorSchema,
+  insertVendorPaymentSchema,
+  insertAttestationServiceSchema,
+  type CashTransaction, type FlightBooking, type Vehicle,
+  type CabBooking, type CabRun, type VisaApplication,
+  type CreditCard, type Vendor, type VendorPayment, type AttestationService,
+} from './schema';
+
+// Re-export Insert* types so client hooks can import from @shared/routes
+export type {
+  InsertCashTransaction,
+  InsertFlightBooking,
+  InsertVehicle,
+  InsertCabBooking,
+  InsertCabRun,
+  InsertVisaApplication,
+  InsertCreditCard,
+  InsertVendor,
+  InsertVendorPayment,
+  InsertAttestationService,
+  InsertServiceCall,
 } from './schema';
 
 // ============================================
@@ -38,7 +56,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/cash-transactions' as const,
       responses: {
-        200: z.array(z.custom<typeof cashTransactions.$inferSelect>()),
+        200: z.array(z.custom<CashTransaction>()),
       },
     },
     create: {
@@ -46,7 +64,7 @@ export const api = {
       path: '/api/cash-transactions' as const,
       input: insertCashTransactionSchema,
       responses: {
-        201: z.custom<typeof cashTransactions.$inferSelect>(),
+        201: z.custom<CashTransaction>(),
         400: errorSchemas.validation,
       },
     },
@@ -67,7 +85,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/flight-bookings' as const,
       responses: {
-        200: z.array(z.custom<typeof flightBookings.$inferSelect>()),
+        200: z.array(z.custom<FlightBooking>()),
       },
     },
     create: {
@@ -75,7 +93,7 @@ export const api = {
       path: '/api/flight-bookings' as const,
       input: insertFlightBookingSchema,
       responses: {
-        201: z.custom<typeof flightBookings.$inferSelect>(),
+        201: z.custom<FlightBooking>(),
         400: errorSchemas.validation,
       },
     },
@@ -84,7 +102,7 @@ export const api = {
       path: '/api/flight-bookings/:id' as const,
       input: insertFlightBookingSchema.partial(),
       responses: {
-        200: z.custom<typeof flightBookings.$inferSelect>(),
+        200: z.custom<FlightBooking>(),
         404: errorSchemas.notFound,
       },
     },
@@ -102,7 +120,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/vehicles' as const,
       responses: {
-        200: z.array(z.custom<typeof vehicles.$inferSelect>()),
+        200: z.array(z.custom<Vehicle>()),
       },
     },
     create: {
@@ -110,7 +128,7 @@ export const api = {
       path: '/api/vehicles' as const,
       input: insertVehicleSchema,
       responses: {
-        201: z.custom<typeof vehicles.$inferSelect>(),
+        201: z.custom<Vehicle>(),
         400: errorSchemas.validation,
       },
     },
@@ -120,7 +138,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/cab-bookings' as const,
       responses: {
-        200: z.array(z.custom<typeof cabBookings.$inferSelect & { vehicle: typeof vehicles.$inferSelect | null }>()),
+        200: z.array(z.custom<CabBooking & { vehicle: Vehicle | null }>()),
       },
     },
     create: {
@@ -128,7 +146,7 @@ export const api = {
       path: '/api/cab-bookings' as const,
       input: insertCabBookingSchema,
       responses: {
-        201: z.custom<typeof cabBookings.$inferSelect>(),
+        201: z.custom<CabBooking>(),
         400: errorSchemas.validation,
       },
     },
@@ -137,7 +155,7 @@ export const api = {
       path: '/api/cab-bookings/:id' as const,
       input: insertCabBookingSchema.partial(),
       responses: {
-        200: z.custom<typeof cabBookings.$inferSelect>(),
+        200: z.custom<CabBooking>(),
         404: errorSchemas.notFound,
       },
     }
@@ -147,7 +165,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/cab-runs' as const,
       responses: {
-        200: z.array(z.custom<typeof cabRuns.$inferSelect>()),
+        200: z.array(z.custom<CabRun>()),
       },
     },
     create: {
@@ -155,7 +173,7 @@ export const api = {
       path: '/api/cab-runs' as const,
       input: insertCabRunSchema,
       responses: {
-        201: z.custom<typeof cabRuns.$inferSelect>(),
+        201: z.custom<CabRun>(),
         400: errorSchemas.validation,
       },
     },
@@ -164,7 +182,7 @@ export const api = {
       path: '/api/cab-runs/:id' as const,
       input: insertCabRunSchema.partial(),
       responses: {
-        200: z.custom<typeof cabRuns.$inferSelect>(),
+        200: z.custom<CabRun>(),
         404: errorSchemas.notFound,
       },
     },
@@ -177,7 +195,7 @@ export const api = {
         search: z.string().optional(),
       }).optional(),
       responses: {
-        200: z.array(z.custom<typeof visaApplications.$inferSelect>()),
+        200: z.array(z.custom<VisaApplication>()),
       },
     },
     create: {
@@ -185,7 +203,7 @@ export const api = {
       path: '/api/visa-applications' as const,
       input: insertVisaApplicationSchema,
       responses: {
-        201: z.custom<typeof visaApplications.$inferSelect>(),
+        201: z.custom<VisaApplication>(),
         400: errorSchemas.validation,
       },
     },
@@ -194,7 +212,7 @@ export const api = {
       path: '/api/visa-applications/:id' as const,
       input: insertVisaApplicationSchema.partial(),
       responses: {
-        200: z.custom<typeof visaApplications.$inferSelect>(),
+        200: z.custom<VisaApplication>(),
         404: errorSchemas.notFound,
       },
     },
@@ -207,7 +225,7 @@ export const api = {
         stampingStatus: z.enum(["locked", "pending", "completed"]).optional(),
       }),
       responses: {
-        200: z.custom<typeof visaApplications.$inferSelect>(),
+        200: z.custom<VisaApplication>(),
         400: errorSchemas.validation,
         404: errorSchemas.notFound,
       },
@@ -218,7 +236,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/credit-cards' as const,
       responses: {
-        200: z.array(z.custom<typeof creditCards.$inferSelect>()),
+        200: z.array(z.custom<CreditCard>()),
       },
     },
     create: {
@@ -226,7 +244,7 @@ export const api = {
       path: '/api/credit-cards' as const,
       input: insertCreditCardSchema,
       responses: {
-        201: z.custom<typeof creditCards.$inferSelect>(),
+        201: z.custom<CreditCard>(),
         400: errorSchemas.validation,
       },
     },
@@ -235,7 +253,7 @@ export const api = {
       path: '/api/credit-cards/:id' as const,
       input: insertCreditCardSchema.partial(),
       responses: {
-        200: z.custom<typeof creditCards.$inferSelect>(),
+        200: z.custom<CreditCard>(),
         404: errorSchemas.notFound,
       },
     },
@@ -244,7 +262,7 @@ export const api = {
       path: '/api/credit-cards/:id/repay' as const,
       input: z.object({ amount: z.coerce.number() }),
       responses: {
-        200: z.custom<typeof creditCards.$inferSelect>(),
+        200: z.custom<CreditCard>(),
         404: errorSchemas.notFound,
       },
     }
@@ -254,7 +272,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/vendors' as const,
       responses: {
-        200: z.array(z.custom<typeof vendors.$inferSelect>()),
+        200: z.array(z.custom<Vendor>()),
       },
     },
     create: {
@@ -262,7 +280,7 @@ export const api = {
       path: '/api/vendors' as const,
       input: insertVendorSchema,
       responses: {
-        201: z.custom<typeof vendors.$inferSelect>(),
+        201: z.custom<Vendor>(),
         400: errorSchemas.validation,
       },
     },
@@ -271,7 +289,7 @@ export const api = {
       path: '/api/vendors/:id' as const,
       input: insertVendorSchema.partial(),
       responses: {
-        200: z.custom<typeof vendors.$inferSelect>(),
+        200: z.custom<Vendor>(),
         404: errorSchemas.notFound,
       },
     },
@@ -280,7 +298,7 @@ export const api = {
       path: '/api/vendors/:id/payments' as const,
       input: insertVendorPaymentSchema,
       responses: {
-        201: z.custom<typeof vendorPayments.$inferSelect>(),
+        201: z.custom<VendorPayment>(),
         404: errorSchemas.notFound,
       },
     }
@@ -290,7 +308,7 @@ export const api = {
       method: 'GET' as const,
       path: '/api/attestation-services' as const,
       responses: {
-        200: z.array(z.custom<typeof attestationServices.$inferSelect>()),
+        200: z.array(z.custom<AttestationService>()),
       },
     },
     create: {
@@ -298,7 +316,7 @@ export const api = {
       path: '/api/attestation-services' as const,
       input: insertAttestationServiceSchema,
       responses: {
-        201: z.custom<typeof attestationServices.$inferSelect>(),
+        201: z.custom<AttestationService>(),
         400: errorSchemas.validation,
       },
     },
@@ -307,7 +325,7 @@ export const api = {
       path: '/api/attestation-services/:id' as const,
       input: insertAttestationServiceSchema.partial(),
       responses: {
-        200: z.custom<typeof attestationServices.$inferSelect>(),
+        200: z.custom<AttestationService>(),
         404: errorSchemas.notFound,
       },
     },
@@ -327,9 +345,9 @@ export const api = {
       input: z.object({ q: z.string() }),
       responses: {
         200: z.object({
-          visa: z.array(z.custom<typeof visaApplications.$inferSelect>()),
-          flights: z.array(z.custom<typeof flightBookings.$inferSelect>()),
-          cabs: z.array(z.custom<typeof cabBookings.$inferSelect>()),
+          visa: z.array(z.custom<VisaApplication>()),
+          flights: z.array(z.custom<FlightBooking>()),
+          cabs: z.array(z.custom<CabBooking>()),
         })
       }
     }
@@ -347,3 +365,6 @@ export function buildUrl(path: string, params?: Record<string, string | number>)
   }
   return url;
 }
+
+
+

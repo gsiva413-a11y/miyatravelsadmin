@@ -1,51 +1,47 @@
-import { pool } from "./db";
+import "dotenv/config";
+import sql from "mssql";
+
+const config: sql.config = {
+  server: process.env.DB_SERVER!,
+  port: parseInt(process.env.DB_PORT || "1433", 10),
+  database: process.env.DB_DATABASE!,
+  user: process.env.DB_USER!,
+  password: process.env.DB_PASSWORD!,
+  options: {
+    encrypt: true,
+    trustServerCertificate: true,
+  },
+};
 
 async function addMissingColumn() {
+  const pool = await sql.connect(config);
   try {
     console.log("Checking if enquired_service_type column exists...");
-    
-    // Check if column exists
-    const checkColumn = await pool.query(`
-      SELECT column_name 
-      FROM information_schema.columns 
-      WHERE table_name='service_calls' AND column_name='enquired_service_type'
+
+    const result = await pool.request().query(`
+      SELECT COLUMN_NAME
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_NAME = 'service_calls'
+        AND COLUMN_NAME = 'enquired_service_type'
     `);
-    
-    if (checkColumn.rows.length > 0) {
+
+    if (result.recordset.length > 0) {
       console.log("Column already exists!");
       return;
     }
-    
-    console.log("Column not found. Creating...");
-    
-    // Create the enum type
-    try {
-      await pool.query(`
-        CREATE TYPE "enquired_service_type" AS ENUM(
-          'Flight Ticket',
-          'Stamping',
-          'Cab',
-          'Passport / Visa',
-          'Medical'
-        )
-      `);
-      console.log("Enum type created");
-    } catch (enumError) {
-      console.log("Enum type already exists, continuing...");
-    }
-    
-    // Add the column
-    await pool.query(`
-      ALTER TABLE "service_calls"
-      ADD COLUMN "enquired_service_type" "enquired_service_type"
+
+    console.log("Column not found. Adding...");
+
+    await pool.request().query(`
+      ALTER TABLE service_calls
+      ADD enquired_service_type NVARCHAR(50) NULL;
     `);
-    
+
     console.log("Column added successfully!");
-    
   } catch (error) {
     console.error("Error:", error instanceof Error ? error.message : error);
   } finally {
-    await pool.end();
+    await pool.close();
     process.exit(0);
   }
 }

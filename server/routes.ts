@@ -408,7 +408,11 @@ export async function registerRoutes(
     res.json(results);
   });
 
-  await seedDatabase();
+  try {
+    await seedDatabase();
+  } catch (err) {
+    console.error("⚠ seedDatabase failed (database may be unavailable):", (err as Error).message);
+  }
 
   return httpServer;
 }

@@ -1,15 +1,32 @@
+﻿import "dotenv/config";
+import sql from "mssql";
 
-import { drizzle } from "drizzle-orm/node-postgres";
-import pg from "pg";
-import * as schema from "@shared/schema";
-
-const { Pool } = pg;
-
-if (!process.env.DATABASE_URL) {
+if (!process.env.DB_SERVER || !process.env.DB_DATABASE || !process.env.DB_USER || !process.env.DB_PASSWORD) {
   throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
+    "SQL Server environment variables must be set: DB_SERVER, DB_DATABASE, DB_USER, DB_PASSWORD",
   );
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle(pool, { schema });
+const mssqlConfig: sql.config = {
+  server: process.env.DB_SERVER,
+  port: parseInt(process.env.DB_PORT || "1433", 10),
+  database: process.env.DB_DATABASE,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  options: {
+    encrypt: true,
+    trustServerCertificate: true,
+  },
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000,
+  },
+};
+
+export const pool = new sql.ConnectionPool(mssqlConfig);
+
+export async function connectDb(): Promise<void> {
+  await pool.connect();
+  console.log("✓ SQL Server connected successfully");
+}
